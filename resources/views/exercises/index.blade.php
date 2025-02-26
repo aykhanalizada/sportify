@@ -6,10 +6,10 @@
                 <h3 class="page-title">
                 <span class="page-title-icon bg-gradient-primary text-white me-2">
                   <i class="mdi mdi-home"></i>
-                </span> Muscle Groups
+                </span> Exercises
                 </h3>
 
-                <a href="{{ route('muscle-groups.create') }}" class="btn btn-gradient-success btn-fw">Create</a>
+                <a href="{{ route('exercises.create') }}" class="btn btn-gradient-success btn-fw">Create</a>
             </div>
 
 
@@ -28,15 +28,15 @@
                                     </thead>
                                     <tbody>
 
-                                    @foreach($muscleGroups as $muscleGroup)
+                                    @foreach($exercises as $exercise)
                                         <tr>
-                                            <td>{{$muscleGroup->name}}</td>
+                                            <td>{{$exercise->name}}</td>
                                             <td class="text-right">
-                                                <a href="{{ route('muscle-groups.edit', $muscleGroup->id) }}"
+                                                <a href="{{ route('exercises.edit', $exercise->id) }}"
                                                    class="btn btn-sm btn-primary">
                                                     <span class="mdi mdi-file-edit-outline"></span> Edit
                                                 </a>
-                                                <form action="{{ route('muscle-groups.destroy', $muscleGroup->id) }}"
+                                                <form action="{{ route('exercises.destroy', $exercise->id) }}"
                                                       method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')

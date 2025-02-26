@@ -12,7 +12,7 @@
 {{--                        {{ $user->name }}--}}
                     Admin
                     </span>
-                    <span class="text-secondary text-small">İstidadəçi</span>
+                    <span class="text-secondary text-small">User</span>
                 </div>
 
             </a>
@@ -20,14 +20,21 @@
 
         <li class="nav-item {{--{{request()->url() == route('dashboard') ? 'active' : '' }}--}}">
             <a class="nav-link" href="{{--{{route('dashboard')}}--}}">
-                <span class="menu-title">Ana Səhifə</span>
+                <span class="menu-title">Dashboard</span>
                 <i class="mdi mdi-home menu-icon"></i>
             </a>
         </li>
 
-        <li class="nav-item {{ request()->url() == route('muscle-group.index') ? 'active' : '' }}">
-            <a class="nav-link" href="{{route('muscle-group.index')}}">
-                <span class="menu-title">Əzələ Qrupu</span>
+        <li class="nav-item {{ request()->url() == route('muscle-groups.index') ? 'active' : '' }}">
+            <a class="nav-link" href="{{route('muscle-groups.index')}}">
+                <span class="menu-title">Muscle Group</span>
+                <i class="mdi mdi-flash menu-icon"></i>
+            </a>
+        </li>
+
+        <li class="nav-item {{ request()->url() == route('exercises.index') ? 'active' : '' }}">
+            <a class="nav-link" href="{{route('exercises.index')}}">
+                <span class="menu-title">Exercise</span>
                 <i class="mdi mdi-flash menu-icon"></i>
             </a>
         </li>

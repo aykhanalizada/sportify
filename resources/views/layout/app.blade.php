@@ -4,7 +4,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Pharmed Admin</title>
+    <title>Sportify Admin</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="{{asset('purple-free/dist/assets/vendors/mdi/css/materialdesignicons.min.css')}}">
     <link rel="stylesheet" href="{{asset('purple-free/dist/assets/vendors/ti-icons/css/themify-icons.css')}}">
@@ -22,6 +22,9 @@
     <link rel="stylesheet" href="{{asset('purple-free/dist/assets/css/style.css')}}">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="{{asset('purple-free/dist/assets/images/favicon.png')}}"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
 </head>
 <body>
 <style>
@@ -47,6 +50,7 @@
     <!-- page-body-wrapper ends -->
 </div>
 <!-- container-scroller -->
+
 <!-- plugins:js -->
 <script src="{{asset('purple-free/dist/assets/vendors/js/vendor.bundle.base.js')}}"></script>
 <!-- endinject -->
@@ -61,8 +65,15 @@
 <script src="{{asset('purple-free/dist/assets/js/todolist.js')}}"></script>
 <script src="{{asset('purple-free/dist/assets/js/jquery.cookie.js')}}"></script>
 <!-- endinject -->
+
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+<!-- Stack scripts -->
+@stack('scripts')
+
 <!-- Custom js for this page -->
 {{--<script src="purple-free/dist/assets/js/dashboard.js"></script>--}}
 <!-- End custom js for this page -->
+
 </body>
 </html>

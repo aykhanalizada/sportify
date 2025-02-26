@@ -12,7 +12,9 @@ class MuscleGroupController extends Controller
      */
     public function index()
     {
-        $muscleGroups = MuscleGroup::select('name')->get();
+        $muscleGroups = MuscleGroup::select('id', 'name')
+            ->where('is_deleted',0)
+            ->get();
 
         return view('muscle-group.index', compact('muscleGroups'));
     }
@@ -33,14 +35,8 @@ class MuscleGroupController extends Controller
         MuscleGroup::create([
             'name' => $request->name
         ]);
-    }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        return redirect()->route('muscle-groups.index');
     }
 
     /**
@@ -48,7 +44,9 @@ class MuscleGroupController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $muscleGroup = MuscleGroup::findOrFail($id);
+
+        return view('muscle-group.edit', compact('muscleGroup'));
     }
 
     /**
@@ -56,7 +54,12 @@ class MuscleGroupController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $muscleGroup = MuscleGroup::findOrFail($id);
+
+        $muscleGroup->name = $request->name;
+        $muscleGroup->save();
+
+        return redirect()->route('muscle-groups.index');
     }
 
     /**
@@ -64,6 +67,11 @@ class MuscleGroupController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $muscleGroup = MuscleGroup::findOrFail($id);
+
+        $muscleGroup->is_deleted = 1;
+        $muscleGroup->save();
+
+        return redirect()->route('muscle-groups.index');
     }
 }
