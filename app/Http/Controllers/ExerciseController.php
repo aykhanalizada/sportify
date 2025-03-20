@@ -14,7 +14,6 @@ class ExerciseController extends Controller
     public function index()
     {
         $exercises = Exercise::with('muscleGroups')
-            ->where('is_deleted', 0)
             ->get();
 
         return view('exercises.index', compact('exercises',));
@@ -26,7 +25,6 @@ class ExerciseController extends Controller
     public function create()
     {
         $muscleGroups = MuscleGroup::select('id', 'name')
-            ->where('is_deleted', 0)
             ->get();
 
         return view('exercises.create', compact('muscleGroups'));
@@ -38,7 +36,9 @@ class ExerciseController extends Controller
     public function store(Request $request)
     {
         $exercise = Exercise::create([
-            'name' => $request->name
+            'name' => $request->name,
+            'is_unilateral' => $request->is_unilateral,
+            'is_timed' => $request->is_timed
         ]);
 
         $exercise->muscleGroups()->attach($request->muscle_groups);
@@ -56,7 +56,6 @@ class ExerciseController extends Controller
             ->findOrFail($id);
 
         $muscleGroups = MuscleGroup::select('id', 'name')
-            ->where('is_deleted', 0)
             ->get();
 
         return view('exercises.edit', compact('exercise', 'muscleGroups'));
@@ -70,6 +69,10 @@ class ExerciseController extends Controller
         $exercise = Exercise::findOrFail($id);
 
         $exercise->name = $request->name;
+        $exercise->is_unilateral = $request->is_unilateral;
+        $exercise->is_timed = $request->is_timed;
+
+        $exercise->save();
 
         $exercise->muscleGroups()->sync($request->muscle_groups);
 
@@ -83,8 +86,7 @@ class ExerciseController extends Controller
     {
         $exercise = Exercise::findOrFail($id);
 
-        $exercise->is_deleted = 1;
-        $exercise->save();
+        $exercise->delete();
 
         return redirect()->route('exercises.index');
     }

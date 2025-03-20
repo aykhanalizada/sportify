@@ -25,6 +25,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
 
+    @livewireStyles
 </head>
 <body>
 <style>
@@ -68,6 +69,25 @@
 
 <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize any element with class 'choices-select'
+        const choicesElements = document.querySelectorAll('.choices-select');
+        if (choicesElements.length > 0) {
+            choicesElements.forEach(element => {
+                new Choices(element, {
+                    removeItemButton: true,
+                    searchEnabled: true,
+                    renderChoiceLimit: -1,
+                    placeholderValue: 'Select options',
+                    searchPlaceholderValue: 'Search...'
+                });
+            });
+        }
+    });
+</script>
+
+@livewireScripts
 <!-- Stack scripts -->
 @stack('scripts')
 

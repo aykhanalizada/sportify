@@ -10,12 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('workout_exercises', function (Blueprint $table) {
+        Schema::create('workout_exercise', function (Blueprint $table) {
             $table->id();
             $table->foreignId('workout_id')->constrained();
             $table->foreignId('exercise_id')->constrained();
-            $table->integer('best_reps')->nullable();
-            $table->decimal('best_weight_kg', 5, 2)->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('workout_exercises');
+        Schema::dropIfExists('workout_exercise');
     }
 };

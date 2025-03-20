@@ -25,9 +25,9 @@
             </a>
         </li>
 
-        <li class="nav-item {{ request()->url() == route('muscle-groups.index') ? 'active' : '' }}">
-            <a class="nav-link" href="{{route('muscle-groups.index')}}">
-                <span class="menu-title">Muscle Group</span>
+        <li class="nav-item {{ request()->url() == route('workouts.index') ? 'active' : '' }}">
+            <a class="nav-link" href="{{route('workouts.index')}}">
+                <span class="menu-title">Workouts</span>
                 <i class="mdi mdi-flash menu-icon"></i>
             </a>
         </li>
@@ -38,5 +38,14 @@
                 <i class="mdi mdi-flash menu-icon"></i>
             </a>
         </li>
+
+
+        <li class="nav-item {{ request()->url() == route('muscle-groups.index') ? 'active' : '' }}">
+            <a class="nav-link" href="{{route('muscle-groups.index')}}">
+                <span class="menu-title">Muscle Group</span>
+                <i class="mdi mdi-flash menu-icon"></i>
+            </a>
+        </li>
+
     </ul>
 </nav>

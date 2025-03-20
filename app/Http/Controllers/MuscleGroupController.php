@@ -12,9 +12,7 @@ class MuscleGroupController extends Controller
      */
     public function index()
     {
-        $muscleGroups = MuscleGroup::select('id', 'name')
-            ->where('is_deleted',0)
-            ->get();
+        $muscleGroups = MuscleGroup::select('id', 'name')->get();
 
         return view('muscle-group.index', compact('muscleGroups'));
     }
@@ -69,8 +67,7 @@ class MuscleGroupController extends Controller
     {
         $muscleGroup = MuscleGroup::findOrFail($id);
 
-        $muscleGroup->is_deleted = 1;
-        $muscleGroup->save();
+        $muscleGroup->delete();
 
         return redirect()->route('muscle-groups.index');
     }

@@ -34,6 +34,23 @@
                                 @enderror
                             </div>
 
+
+                            <div class="form-group mb-3">
+                                <label for="muscle_groups" class="form-label">Unilateral</label>
+                                <select class="form-control choices-select" name="is_unilateral">
+                                    <option {{$exercise->is_unilateral == 1 ? 'selected' : ''}} value="1">Yes</option>
+                                    <option {{$exercise->is_unilateral == 0 ? 'selected' : ''}}  value="0">No</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="muscle_groups" class="form-label">Timed</label>
+                                <select class="form-control choices-select" name="is_timed">
+                                    <option {{$exercise->is_timed == 1 ? 'selected' : ''}} value="1">Yes</option>
+                                    <option {{$exercise->is_timed == 0 ? 'selected' : ''}}  value="0">No</option>
+                                </select>
+                            </div>
+
                             <div class="mt-4">
                                 <button type="submit" class="btn btn-gradient-primary me-2">Submit</button>
                             </div>

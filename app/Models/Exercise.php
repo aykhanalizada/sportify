@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Exercise extends Model
 {
-    protected $fillable = ['name'];
+    use SoftDeletes;
+
+    protected $fillable = ['name','is_unilateral'];
 
     public function muscleGroups()
     {

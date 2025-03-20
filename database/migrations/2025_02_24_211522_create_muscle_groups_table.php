@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('muscle_groups', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->boolean('is_deleted')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
