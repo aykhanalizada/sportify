@@ -5,32 +5,64 @@
             <div class="page-header">
                 <h3 class="page-title">
                 <span class="page-title-icon bg-gradient-primary text-white me-2">
-                  <i class="mdi mdi-home"></i>
+                  <i class="mdi mdi-dumbbell"></i>
                 </span> Exercises
                 </h3>
-
                 <a href="{{ route('exercises.create') }}" class="btn btn-gradient-success btn-fw">Create</a>
             </div>
-
 
             <div class="row">
                 <div class="col-lg-12 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-
                             <div class="table-responsive">
                                 <table class="table table-striped">
                                     <thead>
                                     <tr>
                                         <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Movement</th>
+                                        <th>Bodyweight</th>
+                                        <th>Timed</th>
+                                        <th>Created</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-
                                     @foreach($exercises as $exercise)
                                         <tr>
-                                            <td>{{$exercise->name}}</td>
+                                            <td>{{ $exercise->name }}</td>
+                                            <td>
+                                                @if($exercise->is_timed)
+                                                    <span class="badge badge-warning">Timed</span>
+                                                @elseif($exercise->is_bodyweight)
+                                                    <span class="badge badge-primary">Bodyweight</span>
+                                                @else
+                                                    <span class="badge badge-success">Weighted</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($exercise->movement == 'unilateral')
+                                                    <span class="badge badge-info">Unilateral</span>
+                                                @else
+                                                    <span class="badge badge-secondary">Bilateral</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($exercise->is_bodyweight)
+                                                    <span class="mdi mdi-check-circle text-success h4"></span>
+                                                @else
+                                                    <span class="mdi mdi-close-circle text-danger h4"></span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($exercise->is_timed)
+                                                    <span class="mdi mdi-check-circle text-success h4"></span>
+                                                @else
+                                                    <span class="mdi mdi-close-circle text-danger h4"></span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $exercise->created_at->format('M d, Y') }}</td>
                                             <td class="text-right">
                                                 <a href="{{ route('exercises.edit', $exercise->id) }}"
                                                    class="btn btn-sm btn-primary">
@@ -51,14 +83,15 @@
                                     </tbody>
                                 </table>
                             </div>
+                            @if($exercises->isEmpty())
+                                <div class="text-center py-4">
+                                    <p class="text-muted">No exercises found. Create your first exercise!</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-        <!-- content-wrapper ends -->
-
     </div>
-
 @endsection

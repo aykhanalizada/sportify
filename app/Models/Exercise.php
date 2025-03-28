@@ -9,12 +9,12 @@ class Exercise extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name','is_unilateral'];
+    protected $fillable = ['name','movement','is_bodyweight','is_timed'];
 
     public function muscleGroups()
     {
-        return $this->belongsToMany(MuscleGroup::class, 'exercise_muscle_group',
-            'exercise_id', 'muscle_group_id')
+        return $this->belongsToMany(MuscleGroup::class)
+            ->withPivot('level')
             ->withTimestamps();
     }
 }

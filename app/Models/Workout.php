@@ -9,6 +9,10 @@ class Workout extends Model
 
     protected $fillable = ['date', 'note'];
 
+    protected $casts = [
+        'date' => 'date', // This will automatically convert to Carbon instance
+    ];
+
     public function exercises()
     {
         return $this->belongsToMany(Exercise::class)->withTimestamps();
@@ -17,5 +21,10 @@ class Workout extends Model
     public function workoutExercises()
     {
         return $this->hasMany(WorkoutExercise::class);
+    }
+
+    public function sets()
+    {
+        return $this->hasMany(WorkoutSet::class);
     }
 }

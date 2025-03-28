@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('exercise_id')->constrained();
             $table->foreignId('muscle_group_id')->constrained();
+            $table->enum('level', ['primary', 'secondary', 'tertiary'])->default('primary');
             $table->timestamps();
         });
     }

@@ -18,21 +18,21 @@
             </a>
         </li>
 
-        <li class="nav-item {{--{{request()->url() == route('dashboard') ? 'active' : '' }}--}}">
-            <a class="nav-link" href="{{--{{route('dashboard')}}--}}">
+        <li class="nav-item {{request()->url() == route('dashboard') ? 'active' : '' }}">
+            <a class="nav-link" href="{{route('dashboard')}}">
                 <span class="menu-title">Dashboard</span>
                 <i class="mdi mdi-home menu-icon"></i>
             </a>
         </li>
 
-        <li class="nav-item {{ request()->url() == route('workouts.index') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('workouts*') ? 'active' : '' }}">
             <a class="nav-link" href="{{route('workouts.index')}}">
                 <span class="menu-title">Workouts</span>
                 <i class="mdi mdi-flash menu-icon"></i>
             </a>
         </li>
 
-        <li class="nav-item {{ request()->url() == route('exercises.index') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('exercises*') ? 'active' : '' }}">
             <a class="nav-link" href="{{route('exercises.index')}}">
                 <span class="menu-title">Exercise</span>
                 <i class="mdi mdi-flash menu-icon"></i>
@@ -40,7 +40,7 @@
         </li>
 
 
-        <li class="nav-item {{ request()->url() == route('muscle-groups.index') ? 'active' : '' }}">
+        <li class="nav-item {{ request()->routeIs('muscle-groups*') ? 'active' : '' }}">
             <a class="nav-link" href="{{route('muscle-groups.index')}}">
                 <span class="menu-title">Muscle Group</span>
                 <i class="mdi mdi-flash menu-icon"></i>

@@ -15,11 +15,17 @@ return new class extends Migration {
             $table->foreignId('workout_id')->constrained();
             $table->foreignId('exercise_id')->constrained();
             $table->integer('set_number');
+
             $table->integer('reps')->nullable();
-            $table->decimal('weight_kg', 5, 2)->nullable();
-            $table->enum('side', ['left', 'right', 'both'])->nullable();
+            $table->decimal('weight', 5, 2)->nullable();
+
+            $table->integer('left_reps')->nullable();
+            $table->decimal('left_weight', 5, 2)->nullable();
+            $table->integer('right_reps')->nullable();
+            $table->decimal('right_weight', 5, 2)->nullable();
+
             $table->integer('duration_seconds')->nullable();
-            $table->boolean('is_drop_set')->default(false);
+
             $table->timestamps();
         });
     }

@@ -4,100 +4,195 @@ namespace App\Http\Controllers;
 
 use App\Models\Exercise;
 use App\Models\Workout;
+use App\Models\WorkoutSet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class WorkoutController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $workouts = Workout::all();
+        $workouts = Workout::with(['sets.exercise'])
+            ->orderBy('date', 'desc')
+            ->get();
+
 
 
         return view('workouts.index', compact('workouts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        $exercises = Exercise::all();
-
+        $exercises = Exercise::orderBy('name')->get();
         return view('workouts.create', compact('exercises'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        dd($request->all());
-
-        $workout = Workout::create([
-            'date' => $request->date,
-            'note' => $request->note
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'note' => 'nullable|string',
+            'sets' => 'required|array',
+            'sets.*.*.reps' => 'nullable|integer|min:1',
+            'sets.*.*.weight' => 'nullable|numeric|min:0',
+            'sets.*.*.left_reps' => 'nullable|integer|min:1',
+            'sets.*.*.left_weight' => 'nullable|numeric|min:0',
+            'sets.*.*.right_reps' => 'nullable|integer|min:1',
+            'sets.*.*.right_weight' => 'nullable|numeric|min:0',
+            'sets.*.*.duration_seconds' => 'nullable|integer|min:1'
         ]);
 
-        $exerciseData = [];
+        DB::transaction(function () use ($validated) {
+            $workout = Workout::create([
+                'date' => $validated['date'],
+                'note' => $validated['note'] ?? null
+            ]);
 
-        foreach ($request->exercise_ids as $exerciseId) {
-            $exerciseData[$exerciseId] = [
-                'best_reps' => $request->best_reps[$exerciseId] ?? null,
-                'best_weight_kg' => $request->best_weight[$exerciseId] ?? null,
-            ];
+            foreach ($validated['sets'] as $exerciseId => $sets) {
+                foreach ($sets as $setNumber => $setData) {
+                    $this->createWorkoutSet($workout, $exerciseId, $setNumber, $setData);
+                }
+            }
+        });
 
-            foreach ($request->sets[$exerciseId] as $setNumber => $setData) {
-                DB::table('workout_sets')->insert([
-                    'workout_id' => $workout->id,
-                    'exercise_id' => $exerciseId,
-                    'set_number' => $setNumber + 1,
-                    'reps' => $setData['reps'] ?? null,
-                    'weight_kg' => $setData['weight_kg'] ?? null,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
+        return redirect()->route('workouts.index')
+            ->with('success', 'Workout created successfully');
+    }
+
+    public function show($id)
+    {
+        $workout = Workout::with(['sets.exercise'])
+            ->findOrFail($id);
+
+        $groupedSets = $workout->sets->groupBy('exercise_id');
+
+        return view('workouts.show', [
+            'workout' => $workout,
+            'groupedSets' => $groupedSets
+        ]);
+    }
+
+    public function edit($id)
+    {
+        $workout = Workout::with(['sets.exercise'])
+            ->findOrFail($id);
+
+        $exercises = Exercise::orderBy('name')->get();
+        $groupedSets = $workout->sets->groupBy('exercise_id');
+
+        return view('workouts.edit', compact('workout', 'exercises', 'groupedSets'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'note' => 'nullable|string',
+            'sets' => 'required|array',
+            'sets.*.*.reps' => 'nullable|integer|min:1',
+            'sets.*.*.weight' => 'nullable|numeric|min:0',
+            'sets.*.*.left_reps' => 'nullable|integer|min:1',
+            'sets.*.*.left_weight' => 'nullable|numeric|min:0',
+            'sets.*.*.right_reps' => 'nullable|integer|min:1',
+            'sets.*.*.right_weight' => 'nullable|numeric|min:0',
+            'sets.*.*.duration_seconds' => 'nullable|integer|min:1',
+            'delete_sets' => 'sometimes|array'
+        ]);
+
+        DB::transaction(function () use ($id, $validated) {
+            $workout = Workout::findOrFail($id);
+            $workout->update([
+                'date' => $validated['date'],
+                'note' => $validated['note'] ?? null
+            ]);
+
+            if (!empty($validated['delete_sets'])) {
+                WorkoutSet::whereIn('id', $validated['delete_sets'])->delete();
             }
 
+            foreach ($validated['sets'] as $exerciseId => $sets) {
+                foreach ($sets as $setNumber => $setData) {
+                    if (isset($setData['id'])) {
+                        $this->updateWorkoutSet($setData['id'], $setData);
+                    } else {
+                        $this->createWorkoutSet($workout, $exerciseId, $setNumber, $setData);
+                    }
+                }
+            }
+        });
+
+        return redirect()->route('workouts.index')
+            ->with('success', 'Workout updated successfully');
+    }
+
+    public function destroy($id)
+    {
+        $workout = Workout::findOrFail($id);
+        $workout->delete();
+
+        return redirect()->route('workouts.index')
+            ->with('success', 'Workout deleted successfully');
+    }
+
+    protected function createWorkoutSet($workout, $exerciseId, $setNumber, $setData)
+    {
+        $exercise = Exercise::findOrFail($exerciseId);
+
+        $setData = $this->formatSetData($exercise, $setData);
+
+        return $workout->sets()->create(array_merge(
+            [
+                'exercise_id' => $exerciseId,
+                'set_number' => $setNumber
+            ],
+            $setData
+        ));
+    }
+
+    protected function updateWorkoutSet($setId, $setData)
+    {
+        $set = WorkoutSet::findOrFail($setId);
+        $exercise = $set->exercise;
+
+        $updateData = $this->formatSetData($exercise, $setData);
+
+        // Nullify unused fields
+        $fieldsToNull = [
+            'reps', 'weight', 'left_reps', 'left_weight',
+            'right_reps', 'right_weight', 'duration_seconds'
+        ];
+
+        foreach ($fieldsToNull as $field) {
+            if (!array_key_exists($field, $updateData)) {
+                $updateData[$field] = null;
+            }
         }
 
-        $workout->exercises()->attach($exerciseData);
-
-
+        $set->update($updateData);
+        return $set;
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    protected function formatSetData($exercise, $setData)
     {
-        //
-    }
+        if ($exercise->is_timed) {
+            return [
+                'duration_seconds' => $setData['duration_seconds'] ?? null
+            ];
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        if ($exercise->movement === 'unilateral') {
+            return [
+                'left_reps' => $setData['left_reps'] ?? null,
+                'left_weight' => !$exercise->is_bodyweight ? ($setData['left_weight'] ?? null) : null,
+                'right_reps' => $setData['right_reps'] ?? null,
+                'right_weight' => !$exercise->is_bodyweight ? ($setData['right_weight'] ?? null) : null
+            ];
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        // Bilateral
+        return [
+            'reps' => $setData['reps'] ?? null,
+            'weight' => !$exercise->is_bodyweight ? ($setData['weight'] ?? null) : null
+        ];
     }
 }

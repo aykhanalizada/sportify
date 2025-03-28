@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Exercise;
 use App\Models\MuscleGroup;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ExerciseController extends Controller
 {
@@ -13,10 +14,8 @@ class ExerciseController extends Controller
      */
     public function index()
     {
-        $exercises = Exercise::with('muscleGroups')
-            ->get();
-
-        return view('exercises.index', compact('exercises',));
+        $exercises = Exercise::with('muscleGroups')->get();
+        return view('exercises.index', compact('exercises'));
     }
 
     /**
@@ -24,9 +23,7 @@ class ExerciseController extends Controller
      */
     public function create()
     {
-        $muscleGroups = MuscleGroup::select('id', 'name')
-            ->get();
-
+        $muscleGroups = MuscleGroup::select('id', 'name')->get();
         return view('exercises.create', compact('muscleGroups'));
     }
 
@@ -35,29 +32,46 @@ class ExerciseController extends Controller
      */
     public function store(Request $request)
     {
-        $exercise = Exercise::create([
-            'name' => $request->name,
-            'is_unilateral' => $request->is_unilateral,
-            'is_timed' => $request->is_timed
+        $validated = $request->validate([
+            'name' => 'required|unique:exercises',
+            'movement' => ['required', Rule::in(['bilateral', 'unilateral'])],
+            'is_bodyweight' => 'sometimes|boolean',
+            'is_timed' => 'sometimes|boolean',
+            'muscle_groups' => 'required|array|min:1',
+            'muscle_groups.*.id' => 'required|exists:muscle_groups,id',
+            'muscle_groups.*.level' => 'required|in:primary,secondary,tertiary',
         ]);
 
-        $exercise->muscleGroups()->attach($request->muscle_groups);
+        // Enforce that timed exercises must be bodyweight
+        if ($validated['is_timed'] ?? false) {
+            $validated['is_bodyweight'] = true;
+        }
 
-        return redirect()->route('exercises.index');
+        $exercise = Exercise::create([
+            'name' => $validated['name'],
+            'movement' => $validated['movement'],
+            'is_bodyweight' => $validated['is_bodyweight'] ?? false,
+            'is_timed' => $validated['is_timed'] ?? false,
+        ]);
+
+        // Attach muscle groups with levels
+        $muscleGroups = [];
+        foreach ($validated['muscle_groups'] as $muscleGroup) {
+            $muscleGroups[$muscleGroup['id']] = ['level' => $muscleGroup['level']];
+        }
+        $exercise->muscleGroups()->sync($muscleGroups);
+
+        return redirect()->route('exercises.index')
+            ->with('success', 'Exercise created successfully');
     }
-
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        $exercise = Exercise::with('muscleGroups')
-            ->findOrFail($id);
-
-        $muscleGroups = MuscleGroup::select('id', 'name')
-            ->get();
-
+        $exercise = Exercise::with('muscleGroups')->findOrFail($id);
+        $muscleGroups = MuscleGroup::select('id', 'name')->get();
         return view('exercises.edit', compact('exercise', 'muscleGroups'));
     }
 
@@ -68,15 +82,38 @@ class ExerciseController extends Controller
     {
         $exercise = Exercise::findOrFail($id);
 
-        $exercise->name = $request->name;
-        $exercise->is_unilateral = $request->is_unilateral;
-        $exercise->is_timed = $request->is_timed;
+        $validated = $request->validate([
+            'name' => 'required|unique:exercises,name,' . $id,
+            'movement' => ['required', Rule::in(['bilateral', 'unilateral'])],
+            'is_bodyweight' => 'sometimes|boolean',
+            'is_timed' => 'sometimes|boolean',
+            'muscle_groups' => 'required|array|min:1',
+            'muscle_groups.*.id' => 'required|exists:muscle_groups,id',
+            'muscle_groups.*.level' => 'required|in:primary,secondary,tertiary',
+        ]);
 
-        $exercise->save();
+        // Enforce that timed exercises must be bodyweight
+        if ($validated['is_timed'] ?? false) {
+            $validated['is_bodyweight'] = true;
+        }
 
-        $exercise->muscleGroups()->sync($request->muscle_groups);
+        $exercise->update([
+            'name' => $validated['name'],
+            'movement' => $validated['movement'],
+            'is_bodyweight' => $validated['is_bodyweight'] ?? false,
+            'is_timed' => $validated['is_timed'] ?? false,
+        ]);
 
-        return redirect()->route('exercises.index');
+        // Prepare muscle groups data for sync
+        $muscleGroups = [];
+        foreach ($validated['muscle_groups'] as $muscleGroup) {
+            $muscleGroups[$muscleGroup['id']] = ['level' => $muscleGroup['level']];
+        }
+
+        $exercise->muscleGroups()->sync($muscleGroups);
+
+        return redirect()->route('exercises.index')
+            ->with('success', 'Exercise updated successfully');
     }
 
     /**
@@ -85,9 +122,8 @@ class ExerciseController extends Controller
     public function destroy(string $id)
     {
         $exercise = Exercise::findOrFail($id);
-
         $exercise->delete();
-
-        return redirect()->route('exercises.index');
+        return redirect()->route('exercises.index')
+            ->with('success', 'Exercise deleted successfully');
     }
 }

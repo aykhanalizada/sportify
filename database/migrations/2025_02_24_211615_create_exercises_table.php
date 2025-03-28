@@ -13,7 +13,8 @@ return new class extends Migration {
         Schema::create('exercises', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->boolean('is_unilateral')->default(false);
+            $table->enum('movement', ['bilateral', 'unilateral']);
+            $table->boolean('is_bodyweight')->default(false);
             $table->boolean('is_timed')->default(false);
             $table->softDeletes();
             $table->timestamps();
