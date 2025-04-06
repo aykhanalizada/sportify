@@ -24,7 +24,7 @@
                                         <th>Movement</th>
                                         <th>Bodyweight</th>
                                         <th>Timed</th>
-                                        <th>Created</th>
+                                        <th>Uses Band</th> <!-- New column header -->
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
@@ -62,7 +62,13 @@
                                                     <span class="mdi mdi-close-circle text-danger h4"></span>
                                                 @endif
                                             </td>
-                                            <td>{{ $exercise->created_at->format('M d, Y') }}</td>
+                                            <td> <!-- New column data -->
+                                                @if($exercise->uses_band)
+                                                    <span class="mdi mdi-check-circle text-success h4"></span>
+                                                @else
+                                                    <span class="mdi mdi-close-circle text-danger h4"></span>
+                                                @endif
+                                            </td>
                                             <td class="text-right">
                                                 <a href="{{ route('exercises.edit', $exercise->id) }}"
                                                    class="btn btn-sm btn-primary">

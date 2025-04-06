@@ -30,7 +30,7 @@ class WorkoutController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'date' => 'required|date',
+            'date' => 'required|date|unique:workouts,date',
             'note' => 'nullable|string',
             'sets' => 'required|array',
             'sets.*.*.reps' => 'nullable|integer|min:1',
@@ -89,6 +89,7 @@ class WorkoutController extends Controller
             'date' => 'required|date',
             'note' => 'nullable|string',
             'sets' => 'required|array',
+            'sets.*.*.id' => 'required|string',
             'sets.*.*.reps' => 'nullable|integer|min:1',
             'sets.*.*.weight' => 'nullable|numeric|min:0',
             'sets.*.*.left_reps' => 'nullable|integer|min:1',
@@ -99,6 +100,7 @@ class WorkoutController extends Controller
             'delete_sets' => 'sometimes|array'
         ]);
 
+
         DB::transaction(function () use ($id, $validated) {
             $workout = Workout::findOrFail($id);
             $workout->update([
@@ -106,16 +108,25 @@ class WorkoutController extends Controller
                 'note' => $validated['note'] ?? null
             ]);
 
+            // Handle deleted sets
             if (!empty($validated['delete_sets'])) {
                 WorkoutSet::whereIn('id', $validated['delete_sets'])->delete();
             }
 
+            // Process each exercise's sets
             foreach ($validated['sets'] as $exerciseId => $sets) {
-                foreach ($sets as $setNumber => $setData) {
+                $setNumber = 1; // Initialize set counter for each exercise
+
+                foreach ($sets as $setKey => $setData) {
                     if (isset($setData['id'])) {
-                        $this->updateWorkoutSet($setData['id'], $setData);
-                    } else {
-                        $this->createWorkoutSet($workout, $exerciseId, $setNumber, $setData);
+                        if (str_starts_with($setData['id'], 'new-')) {
+                            // Create new set (ID starts with 'new-')
+                            $this->createWorkoutSet($workout, $exerciseId, $setNumber, $setData);
+                        } else {
+                            // Update existing set
+                            $this->updateWorkoutSet($setData['id'], $setData);
+                        }
+                        $setNumber++;
                     }
                 }
             }

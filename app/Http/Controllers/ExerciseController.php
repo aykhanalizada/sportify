@@ -37,6 +37,7 @@ class ExerciseController extends Controller
             'movement' => ['required', Rule::in(['bilateral', 'unilateral'])],
             'is_bodyweight' => 'sometimes|boolean',
             'is_timed' => 'sometimes|boolean',
+            'uses_band' => 'sometimes|boolean',
             'muscle_groups' => 'required|array|min:1',
             'muscle_groups.*.id' => 'required|exists:muscle_groups,id',
             'muscle_groups.*.level' => 'required|in:primary,secondary,tertiary',
@@ -45,6 +46,12 @@ class ExerciseController extends Controller
         // Enforce that timed exercises must be bodyweight
         if ($validated['is_timed'] ?? false) {
             $validated['is_bodyweight'] = true;
+            $validated['uses_band'] = false;
+        }
+
+        // Enforce that bodyweight exercises can't use bands
+        if ($validated['is_bodyweight'] ?? false) {
+            $validated['uses_band'] = false;
         }
 
         $exercise = Exercise::create([
@@ -52,6 +59,7 @@ class ExerciseController extends Controller
             'movement' => $validated['movement'],
             'is_bodyweight' => $validated['is_bodyweight'] ?? false,
             'is_timed' => $validated['is_timed'] ?? false,
+            'uses_band' => $validated['uses_band'] ?? false,
         ]);
 
         // Attach muscle groups with levels
@@ -87,6 +95,7 @@ class ExerciseController extends Controller
             'movement' => ['required', Rule::in(['bilateral', 'unilateral'])],
             'is_bodyweight' => 'sometimes|boolean',
             'is_timed' => 'sometimes|boolean',
+            'uses_band' => 'sometimes|boolean',
             'muscle_groups' => 'required|array|min:1',
             'muscle_groups.*.id' => 'required|exists:muscle_groups,id',
             'muscle_groups.*.level' => 'required|in:primary,secondary,tertiary',
@@ -95,6 +104,12 @@ class ExerciseController extends Controller
         // Enforce that timed exercises must be bodyweight
         if ($validated['is_timed'] ?? false) {
             $validated['is_bodyweight'] = true;
+            $validated['uses_band'] = false;
+        }
+
+        // Enforce that bodyweight exercises can't use bands
+        if ($validated['is_bodyweight'] ?? false) {
+            $validated['uses_band'] = false;
         }
 
         $exercise->update([
@@ -102,6 +117,7 @@ class ExerciseController extends Controller
             'movement' => $validated['movement'],
             'is_bodyweight' => $validated['is_bodyweight'] ?? false,
             'is_timed' => $validated['is_timed'] ?? false,
+            'uses_band' => $validated['uses_band'] ?? false,
         ]);
 
         // Prepare muscle groups data for sync

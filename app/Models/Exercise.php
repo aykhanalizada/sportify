@@ -9,7 +9,7 @@ class Exercise extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name','movement','is_bodyweight','is_timed'];
+    protected $fillable = ['name','movement','is_bodyweight','is_timed','uses_band'];
 
     public function muscleGroups()
     {

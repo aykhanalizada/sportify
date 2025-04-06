@@ -26,7 +26,8 @@
                                                 <option value="{{ $exercise->id }}"
                                                         data-movement="{{ $exercise->movement }}"
                                                         data-is-bodyweight="{{ $exercise->is_bodyweight ? 'true' : 'false' }}"
-                                                        data-is-timed="{{ $exercise->is_timed ? 'true' : 'false' }}">
+                                                        data-is-timed="{{ $exercise->is_timed ? 'true' : 'false' }}"
+                                                        data-uses-band="{{ $exercise->uses_band ? 'true' : 'false' }}">
                                                     {{ $exercise->name }}
                                                 </option>
                                             @endforeach
@@ -153,6 +154,8 @@
             function addNewSet(exerciseId, movement, isBodyweight, isTimed) {
                 exerciseSetCounters[exerciseId] = (exerciseSetCounters[exerciseId] || 0) + 1;
                 const setNumber = exerciseSetCounters[exerciseId];
+                const selectedOption = exerciseSelect.querySelector(`[value="${exerciseId}"]`);
+                const usesBand = selectedOption.dataset.usesBand === 'true';
 
                 const setContainer = document.getElementById(`exercise-${exerciseId}-sets`);
                 const setElement = document.createElement('div');
@@ -161,20 +164,19 @@
 
                 if (isTimed) {
                     setElement.innerHTML = `
-                      <div class="row align-items-center">
-                            <div class="col-md-2 fw-bold">Set ${setNumber}</div>
-                            <div class="col-md-3">
-                                <label>Seconds</label>
-                                <input type="number" name="sets[${exerciseId}][${setNumber}][duration_seconds]"
-                                    class="form-control" min="1" placeholder="seconds" required>
-                            </div>
-
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-sm btn-danger remove-set-btn mt-4">
-                                    <i class="mdi mdi-minus"></i>
-                                </button>
-                            </div>
-                     </div>
+            <div class="row align-items-center">
+                <div class="col-md-2 fw-bold">Set ${setNumber}</div>
+                <div class="col-md-3">
+                    <label>Seconds</label>
+                    <input type="number" name="sets[${exerciseId}][${setNumber}][duration_seconds]"
+                           class="form-control" min="1" placeholder="seconds" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-sm btn-danger remove-set-btn mt-4">
+                        <i class="mdi mdi-minus"></i>
+                    </button>
+                </div>
+            </div>
         `;
                 } else if (movement === 'unilateral') {
                     setElement.innerHTML = `
@@ -187,23 +189,23 @@
                         <div class="col-md-6">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="small text-muted">L:</span>
-                                <input type="number" name="sets[${exerciseId}][${setNumber}][left_reps]"
-                                       class="form-control form-control-sm" placeholder="Reps" min="1" required>
-                                ${!isBodyweight ? `
+                                ${!isBodyweight && !usesBand ? `
                                 <input type="number" step="0.1" name="sets[${exerciseId}][${setNumber}][left_weight]"
                                        class="form-control form-control-sm" placeholder="kg" min="0">
                                 ` : ''}
+                                <input type="number" name="sets[${exerciseId}][${setNumber}][left_reps]"
+                                       class="form-control form-control-sm" placeholder="Reps" min="1" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="small text-muted">R:</span>
-                                <input type="number" name="sets[${exerciseId}][${setNumber}][right_reps]"
-                                       class="form-control form-control-sm" placeholder="Reps" min="1" required>
-                                ${!isBodyweight ? `
+                                ${!isBodyweight && !usesBand ? `
                                 <input type="number" step="0.1" name="sets[${exerciseId}][${setNumber}][right_weight]"
                                        class="form-control form-control-sm" placeholder="kg" min="0">
                                 ` : ''}
+                                <input type="number" name="sets[${exerciseId}][${setNumber}][right_reps]"
+                                       class="form-control form-control-sm" placeholder="Reps" min="1" required>
                                 <button type="button" class="btn btn-sm btn-danger remove-set-btn ms-auto">
                                     <i class="mdi mdi-minus"></i>
                                 </button>
@@ -214,20 +216,28 @@
             </div>
         `;
                 } else {
+                    // Bilateral exercise
                     setElement.innerHTML = `
-                      <div class="row align-items-center">
-                            <div class="col-md-2 fw-bold">Set ${setNumber}</div>
-                            <div class="col-md-3">
-                                <label>Reps</label>
-                                <input type="number" name="sets[${exerciseId}][${setNumber}][reps]" class="form-control" min="1" required="">
-                            </div>
-
-                            <div class="col-md-2">
-                                <button type="button" class="btn btn-sm btn-danger remove-set-btn mt-4">
-                                    <i class="mdi mdi-minus"></i>
-                                </button>
-                            </div>
-                     </div>
+            <div class="row align-items-center">
+                <div class="col-md-2 fw-bold">Set ${setNumber}</div>
+                ${!isBodyweight && !usesBand ? `
+                <div class="col-md-3">
+                    <label>Weight (kg)</label>
+                    <input type="number" step="0.1" name="sets[${exerciseId}][${setNumber}][weight]"
+                           class="form-control" min="0" placeholder="kg">
+                </div>
+                ` : ''}
+                <div class="col-md-3">
+                    <label>Reps</label>
+                    <input type="number" name="sets[${exerciseId}][${setNumber}][reps]"
+                           class="form-control" min="1">
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-sm btn-danger remove-set-btn mt-4">
+                        <i class="mdi mdi-minus"></i>
+                    </button>
+                </div>
+            </div>
         `;
                 }
 

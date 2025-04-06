@@ -51,6 +51,18 @@
                                 @enderror
                             </div>
 
+                            <!-- New Uses Band toggle -->
+                            <div class="form-group mb-3">
+                                <div class="form-check form-switch ms-5">
+                                    <input class="form-check-input" type="checkbox" name="uses_band" id="uses_band"
+                                           value="1" {{ $exercise->uses_band ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="uses_band">Uses Resistance Band</label>
+                                </div>
+                                @error('uses_band')
+                                <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+
                             <div class="form-group mb-3">
                                 <label class="form-label">Muscle Groups</label>
                                 <div id="muscle-groups-container">
@@ -164,19 +176,37 @@
             // Toggle between timed and bodyweight options
             const isTimedCheckbox = document.getElementById('is_timed');
             const isBodyweightCheckbox = document.getElementById('is_bodyweight');
+            const usesBandCheckbox = document.getElementById('uses_band');
 
             isTimedCheckbox.addEventListener('change', function() {
                 if (this.checked) {
                     isBodyweightCheckbox.checked = true;
                     isBodyweightCheckbox.disabled = true;
+                    usesBandCheckbox.checked = false;
+                    usesBandCheckbox.disabled = true;
                 } else {
                     isBodyweightCheckbox.disabled = false;
+                    usesBandCheckbox.disabled = false;
+                }
+            });
+
+            // Disable uses_band if it's a bodyweight exercise
+            isBodyweightCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    usesBandCheckbox.checked = false;
+                    usesBandCheckbox.disabled = true;
+                } else {
+                    usesBandCheckbox.disabled = false;
                 }
             });
 
             // Initialize the state on page load
             if (isTimedCheckbox.checked) {
                 isBodyweightCheckbox.disabled = true;
+                usesBandCheckbox.disabled = true;
+            }
+            if (isBodyweightCheckbox.checked) {
+                usesBandCheckbox.disabled = true;
             }
         });
     </script>

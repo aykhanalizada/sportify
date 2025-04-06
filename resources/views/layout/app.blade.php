@@ -26,6 +26,20 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
 
     @livewireStyles
+    <style>
+        /* Hide native select until Choices initializes */
+        .choices-select {
+            visibility: hidden;
+            position: absolute;
+        }
+
+        /* Show Choices container */
+        .choices[data-type*="select-one"],
+        .choices[data-type*="select-multiple"] {
+            visibility: visible;
+            position: relative;
+        }
+    </style>
 </head>
 <body>
 <style>
@@ -67,8 +81,10 @@
 <script src="{{asset('purple-free/dist/assets/js/jquery.cookie.js')}}"></script>
 <!-- endinject -->
 
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<link href="{{ asset('css/choices.min.css') }}" rel="stylesheet">
 
+<!-- JS -->
+<script src="{{ asset('js/choices.min.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize any element with class 'choices-select'
@@ -80,7 +96,8 @@
                     searchEnabled: true,
                     renderChoiceLimit: -1,
                     placeholderValue: 'Select options',
-                    searchPlaceholderValue: 'Search...'
+                    searchPlaceholderValue: 'Search...',
+                    closeDropdownOnSelect:true
                 });
             });
         }
