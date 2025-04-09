@@ -169,7 +169,7 @@
                 <div class="col-md-3">
                     <label>Seconds</label>
                     <input type="number" name="sets[${exerciseId}][${setNumber}][duration_seconds]"
-                           class="form-control" min="1" placeholder="seconds" required>
+                           class="form-control" min="1" placeholder="seconds">
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-sm btn-danger remove-set-btn mt-4">
@@ -194,7 +194,7 @@
                                        class="form-control form-control-sm" placeholder="kg" min="0">
                                 ` : ''}
                                 <input type="number" name="sets[${exerciseId}][${setNumber}][left_reps]"
-                                       class="form-control form-control-sm" placeholder="Reps" min="1" required>
+                                       class="form-control form-control-sm" placeholder="Reps" min="1">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -205,7 +205,7 @@
                                        class="form-control form-control-sm" placeholder="kg" min="0">
                                 ` : ''}
                                 <input type="number" name="sets[${exerciseId}][${setNumber}][right_reps]"
-                                       class="form-control form-control-sm" placeholder="Reps" min="1" required>
+                                       class="form-control form-control-sm" placeholder="Reps" min="1">
                                 <button type="button" class="btn btn-sm btn-danger remove-set-btn ms-auto">
                                     <i class="mdi mdi-minus"></i>
                                 </button>
@@ -230,7 +230,7 @@
                 <div class="col-md-3">
                     <label>Reps</label>
                     <input type="number" name="sets[${exerciseId}][${setNumber}][reps]"
-                           class="form-control" min="1">
+                           class="form-control" min="1" placeholder="Reps">
                 </div>
                 <div class="col-md-2">
                     <button type="button" class="btn btn-sm btn-danger remove-set-btn mt-4">
